@@ -13,6 +13,8 @@ public class Empresa {
     private String nit;
     private String direccion;
     private boolean activa;
+    private int mesProceso;
+    private int anioProceso;
 
     // Getters y Setters
     public Long getId() {
@@ -53,5 +55,21 @@ public class Empresa {
 
     public void setActiva(boolean activa) {
         this.activa = activa;
+    }
+
+    public int getMesProceso() {
+        return mesProceso;
+    }
+
+    public void setMesProceso(int mesProceso) {
+        this.mesProceso = mesProceso;
+    }
+
+    public int getAnioProceso() {
+        return anioProceso;
+    }
+
+    public void setAnioProceso(int anioProceso) {
+        this.anioProceso = anioProceso;
     }
 }
