@@ -16,4 +16,6 @@ public class Procedencia {
     private Long id;
 
     private String nombre;
+
+    private boolean activo;
 }

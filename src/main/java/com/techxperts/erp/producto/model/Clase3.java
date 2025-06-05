@@ -16,4 +16,6 @@ public class Clase3 {
     private Long id;
 
     private String nombre;
+
+    private boolean activo;
 }

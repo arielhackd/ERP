@@ -1,9 +1,9 @@
 package com.techxperts.erp.producto.repository;
 
-import com.techxperts.erp.producto.model.Marca;
+import com.techxperts.erp.producto.model.Procedencia;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProcedenciaRepository extends JpaRepository<Marca, Long> {
+public interface ProcedenciaRepository extends JpaRepository<Procedencia, Long> {
 }
