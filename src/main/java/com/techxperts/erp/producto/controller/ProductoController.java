@@ -1,6 +1,7 @@
 package com.techxperts.erp.producto.controller;
 
 import com.techxperts.erp.producto.model.Producto;
+import com.techxperts.erp.producto.dto.ProductoDTO;
 import com.techxperts.erp.producto.service.ProductoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +21,12 @@ public class ProductoController {
     }
 
     @GetMapping
-    public List<Producto> listar() {
-        return productoService.listar();
+    public List<ProductoDTO> listarProductos() {
+        return productoService.obtenerTodos();
     }
 
     @GetMapping("/{id}")
-    public Producto obtener(@PathVariable Long id) {
+    public ProductoDTO obtener(@PathVariable Long id) {
         return productoService.obtenerPorId(id);
     }
 }
