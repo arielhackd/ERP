@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class ProductoDTO {
     private Long id;
+    private boolean activo;
     private String codigo;
     private String nombre;
     private String marca;
