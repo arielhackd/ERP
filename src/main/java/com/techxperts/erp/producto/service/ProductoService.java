@@ -36,6 +36,36 @@ public class ProductoService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado"));
     }
 
+    public ProductoDTO crearProducto(ProductoDTO dto) {
+        Producto producto = new Producto();
+
+        producto.setActivo(dto.isActivo());
+        producto.setCodigo(dto.getCodigo());
+        producto.setNombre(dto.getNombre());
+
+        producto.setMarca(marcaRepository.findById(dto.getMarcaID())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Marca no encontrada")));
+
+        producto.setMedida(medidaRepository.findById(dto.getMedidaID())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Medida no encontrada")));
+
+        producto.setClase1(clase1Repository.findById(dto.getClase1ID())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Clase1 no encontrada")));
+
+        producto.setClase2(clase2Repository.findById(dto.getClase2ID())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Clase2 no encontrada")));
+
+        producto.setClase3(clase3Repository.findById(dto.getClase3ID())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Clase3 no encontrada")));
+
+        producto.setProcedencia(procedenciaRepository.findById(dto.getProcedenciaID())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Procedencia no encontrada")));
+
+        Producto guardado = productoRepository.save(producto);
+
+        return mapearADTO(guardado); // reutilizamos el mapper existente
+    }
+
     private ProductoDTO mapearADTO(Producto producto) {
         ProductoDTO dto = new ProductoDTO();
         dto.setId(producto.getId());

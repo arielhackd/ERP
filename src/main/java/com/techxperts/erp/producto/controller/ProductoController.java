@@ -26,4 +26,10 @@ public class ProductoController {
     public ProductoDTO obtener(@PathVariable Long id) {
         return productoService.obtenerPorId(id);
     }
+
+    @PostMapping
+    public ResponseEntity<ProductoDTO> crearProducto(@RequestBody ProductoDTO dto) {
+        ProductoDTO creado = productoService.crearProducto(dto);
+        return new ResponseEntity<>(creado, HttpStatus.CREATED);
+    }
 }
