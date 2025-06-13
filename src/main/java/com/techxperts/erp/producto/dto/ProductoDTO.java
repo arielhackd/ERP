@@ -8,10 +8,18 @@ public class ProductoDTO {
     private boolean activo;
     private String codigo;
     private String nombre;
-    private String marca;
-    private String clase1;
-    private String clase2;
-    private String clase3;
-    private String medida;
-    private String procedencia;
+
+    private String clase1Nombre;
+    private String clase2Nombre;
+    private String clase3Nombre;
+    private String marcaNombre;
+    private String medidaNombre;
+    private String procedenciaNombre;
+
+    private Long clase1ID;
+    private Long clase2ID;
+    private Long clase3ID;
+    private Long marcaID;
+    private Long medidaID;
+    private Long procedenciaID;
 }

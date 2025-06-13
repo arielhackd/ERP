@@ -17,18 +17,6 @@ public class ProductoController {
 
     private final ProductoService productoService;
 
-    @PostMapping
-    public ResponseEntity<ProductoDTO> crearProducto(@RequestBody ProductoDTO productoDTO) {
-        ProductoDTO creado = productoService.crearProducto(productoDTO);
-        return new ResponseEntity<>(creado, HttpStatus.CREATED);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductoDTO> actualizarProducto(@PathVariable Long id, @RequestBody ProductoDTO productoDTO) {
-        ProductoDTO actualizado = productoService.actualizarProducto(id, productoDTO);
-        return ResponseEntity.ok(actualizado);
-    }
-
     @GetMapping
     public List<ProductoDTO> listarProductos() {
         return productoService.obtenerTodos();
