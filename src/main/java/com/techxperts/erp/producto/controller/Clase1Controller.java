@@ -1,8 +1,11 @@
 package com.techxperts.erp.producto.controller;
 
 import com.techxperts.erp.producto.model.Clase1;
+import com.techxperts.erp.producto.model.Marca;
 import com.techxperts.erp.producto.service.Clase1Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,9 +17,10 @@ public class Clase1Controller {
 
     private final Clase1Service clase1Service;
 
-    @PostMapping
-    public Clase1 crear(@RequestBody Clase1 clase1) {
-        return clase1Service.crear(clase1);
+    @PostMapping("/{empresaId}")
+    public ResponseEntity<Clase1> crear(@RequestBody Clase1 clase1,@PathVariable Long empresaId) {
+        Clase1 creada = clase1Service.crear(clase1, empresaId);
+        return new ResponseEntity<>(creada, HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -24,8 +28,8 @@ public class Clase1Controller {
         return clase1Service.listar();
     }
 
-    @GetMapping("/{id}")
-    public Clase1 obtener(@PathVariable Long id) {
-        return clase1Service.obtenerPorId(id);
+    @GetMapping("/empresa/{empresaId}")
+    public List<Clase1> obtenerClase1PorEmpresa(@PathVariable Long empresaId) {
+        return clase1Service.obtenerPorEmpresa(empresaId);
     }
 }
