@@ -13,7 +13,7 @@ public class Clase3Service {
 
     private final Clase3Repository clase3Repository;
 
-    public Clase3 crear(Clase3 clase3) {
+    public Clase3 crear(Clase3 clase3, Long empresaId) {
         return clase3Repository.save(clase3);
     }
 
@@ -23,5 +23,9 @@ public class Clase3Service {
 
     public Clase3 obtenerPorId(Long id) {
         return clase3Repository.findById(id).orElse(null);
+    }
+
+    public List<Clase3> obtenerPorEmpresa(Long empresaId){
+        return clase3Repository.findByEmpresaId(empresaId);
     }
 }
