@@ -44,9 +44,48 @@ public class ProductoService {
         return productoRepository.save(producto);
     }
 
+    public ProductoDTO actualizarProducto(Long id, ProductoDTO dto){
+        Producto existente = productoRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado."));
+
+        // Puedes optar por actualizar solo campos no nulos del DTO
+        existente.setCodigo(dto.getCodigo());
+        existente.setNombre(dto.getNombre());
+        existente.setDescripcion2(dto.getDescripcion2());
+        existente.setDescripcion3(dto.getDescripcion3());
+        existente.setObservaciones(dto.getObservaciones());
+        existente.setTipo(dto.getTipo());
+        existente.setCosto(dto.getCosto());
+        existente.setPrecio(dto.getPrecio());
+        existente.setDescuentoMaximo(dto.getDescuentoMaximo());
+        existente.setPrecioOferta(dto.getPrecioOferta());
+        existente.setFechaInicioOferta(dto.getFechaInicioOferta());
+        existente.setFechaFinOferta(dto.getFechaFinOferta());
+        existente.setUsaEscalas(dto.isUsaEscalas());
+
+        // Actualizar relaciones (si vienen en el DTO)
+        existente.setMarca(marcaRepository.findById(dto.getMarcaId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Marca no encontrada")));
+        existente.setMedida(medidaRepository.findById(dto.getMedidaId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Medida no encontrada")));
+        existente.setClase1(clase1Repository.findById(dto.getClase1Id())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Clase1 no encontrada")));
+        existente.setClase2(clase2Repository.findById(dto.getClase2Id())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Clase2 no encontrada")));
+        existente.setClase3(clase3Repository.findById(dto.getClase3Id())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Clase3 no encontrada")));
+        existente.setProcedencia(procedenciaRepository.findById(dto.getProcedenciaId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Procedencia no encontrada")));
+        existente.setEmpresa(empresaRepository.findById(dto.getEmpresaId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Empresa no encontrada")));
+
+        Producto updated = productoRepository.save(existente);
+        return mapearADTO(updated);
+    }
+
     public Producto mapearADominio(ProductoDTO dto) {
         Producto producto = new Producto();
 
+        producto.setActivo(dto.isActivo());
         producto.setCodigo(dto.getCodigo());
         producto.setNombre(dto.getNombre());
         producto.setDescripcion2(dto.getDescripcion2());
@@ -67,11 +106,13 @@ public class ProductoService {
         producto.setUsaSeries(dto.isUsaSeries());
 
         // Relaciones
+
+        producto.setClase1(clase1Repository.findById(dto.getClase1Id()).orElseThrow());
+        producto.setClase2(clase2Repository.findById(dto.getClase2Id()).orElseThrow());
+        producto.setClase3(clase3Repository.findById(dto.getClase3Id()).orElseThrow());
         producto.setEmpresa(empresaRepository.findById(dto.getEmpresaId()).orElseThrow());
         producto.setMarca(marcaRepository.findById(dto.getMarcaId()).orElseThrow());
-        producto.setClase1(clase1Repository.findById(dto.getClase1Id()).orElseThrow());
-        producto.setClase2(clase2Repository.findById(dto.getClase2Id()).orElse(null));
-        producto.setClase3(clase3Repository.findById(dto.getClase3Id()).orElse(null));
+        producto.setMedida(medidaRepository.findById(dto.getMedidaId()).orElseThrow());
         producto.setProcedencia(procedenciaRepository.findById(dto.getProcedenciaId()).orElse(null));
 
         return producto;

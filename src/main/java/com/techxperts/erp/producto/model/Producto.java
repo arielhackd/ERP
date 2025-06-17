@@ -19,6 +19,8 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private boolean activo;
+
     private String codigo;
     private String nombre;
     private String descripcion2; // para búsquedas internas
@@ -47,10 +49,6 @@ public class Producto {
     private boolean usaSeries;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "marca_id")
-    private Marca marca;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "clase1_id")
     private Clase1 clase1;
 
@@ -63,14 +61,16 @@ public class Producto {
     private Clase3 clase3;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "procedencia_id")
-    private Procedencia procedencia;
+    @JoinColumn(name = "marca_id")
+    private Marca marca;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "medida_id")
     private Medida medida;
 
-    private boolean activo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "procedencia_id")
+    private Procedencia procedencia;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empresa_id")

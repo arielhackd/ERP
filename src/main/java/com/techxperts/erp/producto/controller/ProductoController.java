@@ -33,4 +33,10 @@ public class ProductoController {
         ProductoDTO respuesta = productoService.mapearADTO(creado);
         return new ResponseEntity<>(respuesta, HttpStatus.CREATED);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductoDTO> actualizarProducto(@PathVariable Long id, @RequestBody ProductoDTO dto) {
+        ProductoDTO actualizado = productoService.actualizarProducto(id, dto);
+        return ResponseEntity.ok(actualizado);
+    }
 }
