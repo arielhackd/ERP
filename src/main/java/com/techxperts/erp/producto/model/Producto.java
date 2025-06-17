@@ -4,6 +4,9 @@ import com.techxperts.erp.empresa.model.Empresa;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "productos")
 @Data
@@ -17,8 +20,31 @@ public class Producto {
     private Long id;
 
     private String codigo;
-
     private String nombre;
+    private String descripcion2; // para búsquedas internas
+    private String descripcion3; // para impresión en documentos
+    private String observaciones;
+
+    @Column(length = 20)
+    private String tipo; // "BIEN" o "SERVICIO"
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal costo;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal precio;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal descuentoMaximo;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal precioOferta;
+
+    private LocalDate fechaInicioOferta = LocalDate.of(2000, 1, 1);
+    private LocalDate fechaFinOferta = LocalDate.of(2000, 1, 1);
+
+    private boolean usaEscalas;
+    private boolean usaSeries;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "marca_id")
