@@ -2,13 +2,16 @@ package com.techxperts.erp.producto.service;
 
 import com.techxperts.erp.empresa.repository.EmpresaRepository;
 import com.techxperts.erp.producto.dto.ProductoDTO;
-import com.techxperts.erp.producto.model.Producto;
+import com.techxperts.erp.producto.model.*;
 import com.techxperts.erp.producto.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +29,13 @@ public class ProductoService {
     private final Clase3Repository clase3Repository;
     private final ProcedenciaRepository procedenciaRepository;
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public class BadRequestException extends RuntimeException {
+        public BadRequestException(String message) {
+            super(message);
+        }
+    }
+
     public List<ProductoDTO> obtenerTodos() {
         List<Producto> productos = productoRepository.findAll();
         return productos.stream()
@@ -40,8 +50,62 @@ public class ProductoService {
     }
 
     public Producto crearProducto(ProductoDTO dto) {
+        validarProducto(dto);
         Producto producto = mapearADominio(dto);
         return productoRepository.save(producto);
+    }
+
+    private void validarProducto(ProductoDTO dto) {
+        // Validación 1: Precio oferta menor al normal
+        if (dto.getPrecioOferta() != null && dto.getPrecioOferta().compareTo(dto.getPrecio()) >= 0) {
+            throw new BadRequestException("El precio de oferta debe ser menor al precio normal.");
+        }
+
+        // Validación 2: Fechas de oferta válidas
+        if (dto.getFechaInicioOferta() != null && dto.getFechaFinOferta() != null &&
+                dto.getFechaFinOferta().isBefore(dto.getFechaInicioOferta())) {
+            throw new BadRequestException("La fecha de fin de la oferta no puede ser anterior a la fecha de inicio.");
+        }
+
+        // Validación 3: Descuento máximo no mayor al 100%
+        if (dto.getDescuentoMaximo() != null && dto.getDescuentoMaximo().compareTo(BigDecimal.valueOf(100)) > 0) {
+            throw new BadRequestException("El descuento máximo no puede ser mayor al 100%.");
+        }
+
+        // Validación 4: Código único por empresa
+        boolean existe = productoRepository.existsByCodigoAndEmpresaId(dto.getCodigo(), dto.getEmpresaId());
+        if (existe) {
+            throw new BadRequestException("Ya existe un producto con este código para esta empresa.");
+        }
+
+        // Validación 5: Entidades relacionadas existen y pertenecen a la empresa
+        Long empresaId = dto.getEmpresaId();
+
+        clase1Repository.findById(dto.getClase1Id())
+                .filter(c -> c.getEmpresa().getId().equals(empresaId))
+                .orElseThrow(() -> new BadRequestException("La Clase1 no existe o no pertenece a la empresa"));
+
+        clase2Repository.findById(dto.getClase2Id())
+                .filter(c -> c.getEmpresa().getId().equals(empresaId))
+                .orElseThrow(() -> new BadRequestException("La Clase2 no existe o no pertenece a la empresa"));
+
+        clase3Repository.findById(dto.getClase3Id())
+                .filter(c -> c.getEmpresa().getId().equals(empresaId))
+                .orElseThrow(() -> new BadRequestException("La Clase3 no existe o no pertenece a la empresa"));
+
+        marcaRepository.findById(dto.getMarcaId())
+                .filter(m -> m.getEmpresa().getId().equals(empresaId))
+                .orElseThrow(() -> new BadRequestException("La Marca no existe o no pertenece a la empresa"));
+
+        medidaRepository.findById(dto.getMedidaId())
+                .filter(m -> m.getEmpresa().getId().equals(empresaId))
+                .orElseThrow(() -> new BadRequestException("La Medida no existe o no pertenece a la empresa"));
+
+        if (dto.getProcedenciaId() != null) {
+            procedenciaRepository.findById(dto.getProcedenciaId())
+                    .filter(p -> p.getEmpresa().getId().equals(empresaId))
+                    .orElseThrow(() -> new BadRequestException("La Procedencia no existe o no pertenece a la empresa"));
+        }
     }
 
     public ProductoDTO actualizarProducto(Long id, ProductoDTO dto){
