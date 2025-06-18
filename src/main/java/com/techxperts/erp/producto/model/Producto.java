@@ -36,8 +36,7 @@ public class Producto {
     @Column(precision = 10, scale = 2)
     private BigDecimal precio;
 
-    @Column(precision = 10, scale = 2)
-    private BigDecimal descuentoMaximo;
+    private Integer descuentoMaximo;
 
     @Column(precision = 10, scale = 2)
     private BigDecimal precioOferta;

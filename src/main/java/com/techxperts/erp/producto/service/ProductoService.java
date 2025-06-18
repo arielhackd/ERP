@@ -68,8 +68,8 @@ public class ProductoService {
         }
 
         // Validación 3: Descuento máximo no mayor al 100%
-        if (dto.getDescuentoMaximo() != null && dto.getDescuentoMaximo().compareTo(BigDecimal.valueOf(100)) > 0) {
-            throw new BadRequestException("El descuento máximo no puede ser mayor al 100%.");
+        if (dto.getDescuentoMaximo() != null && dto.getDescuentoMaximo() > 40) {
+            throw new BadRequestException("El descuento máximo no puede ser mayor al 40%");
         }
 
         // Validación 4: Código único por empresa
@@ -132,8 +132,8 @@ public class ProductoService {
         }
 
         // Descuento máximo válido
-        if (dto.getDescuentoMaximo() != null && dto.getDescuentoMaximo().compareTo(BigDecimal.valueOf(100)) > 0) {
-            throw new BadRequestException("El descuento máximo no puede ser mayor al 100%.");
+        if (dto.getDescuentoMaximo() != null && dto.getDescuentoMaximo() > 40) {
+            throw new BadRequestException("El descuento máximo no puede ser mayor al 40%");
         }
 
         // Si el código fue modificado, validar que no esté duplicado

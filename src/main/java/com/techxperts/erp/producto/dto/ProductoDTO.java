@@ -18,7 +18,7 @@ public class ProductoDTO {
 
     private BigDecimal costo;
     private BigDecimal precio;
-    private BigDecimal descuentoMaximo;
+    private Integer descuentoMaximo;
     private BigDecimal precioOferta;
     private LocalDate fechaInicioOferta;
     private LocalDate fechaFinOferta;
