@@ -1,8 +1,9 @@
 package com.techxperts.erp.producto.controller;
 
 import com.techxperts.erp.producto.dto.ListaPrecioDTO;
+import com.techxperts.erp.producto.model.ListaPrecio;
 import com.techxperts.erp.producto.service.ListaPrecioService;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +19,13 @@ public class ListaPrecioController {
 
     @PostMapping
     public ResponseEntity<ListaPrecioDTO> crear(@RequestBody ListaPrecioDTO dto) {
-        return new ResponseEntity<>(listaPrecioService.crear(dto), HttpStatus.CREATED);
+        ListaPrecio creada = listaPrecioService.crearListaPrecio(dto);
+        ListaPrecioDTO respuesta = listaPrecioService.mapearADTO(creada);
+        return new ResponseEntity<>(respuesta, HttpStatus.CREATED);
     }
 
     @GetMapping("/empresa/{empresaId}")
-    public ResponseEntity<List<ListaPrecioDTO>> listarPorEmpresa(@PathVariable Long empresaId) {
-        return ResponseEntity.ok(listaPrecioService.listarPorEmpresa(empresaId));
+    public List<ListaPrecioDTO> listarPorEmpresa(@PathVariable Long empresaId) {
+        return listaPrecioService.obtenerPorEmpresa(empresaId);
     }
 }

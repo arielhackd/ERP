@@ -6,14 +6,13 @@ import com.techxperts.erp.empresa.model.Empresa;
 import com.techxperts.erp.producto.model.ListaPrecio;
 import com.techxperts.erp.empresa.repository.EmpresaRepository;
 import com.techxperts.erp.producto.repository.ListaPrecioRepository;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.springframework.http.HttpStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -22,36 +21,35 @@ public class ListaPrecioService {
     private final ListaPrecioRepository listaPrecioRepository;
     private final EmpresaRepository empresaRepository;
 
-    public ListaPrecioDTO crear(ListaPrecioDTO dto) {
-        if (listaPrecioRepository.existsByNombreAndEmpresaId(dto.getNombre(), dto.getEmpresaId())) {
-            throw new ResponseStatusException(BAD_REQUEST, "Ya existe una lista de precio con ese nombre en la empresa.");
+    public ListaPrecio crearListaPrecio(ListaPrecioDTO dto){
+        Empresa empresa = empresaRepository.findById(dto.getEmpresaId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empresa no encontrada."));
+        dto.setEmpresaId(empresa.getId());
+        ListaPrecio creada = mapearADominio(dto);
+        return listaPrecioRepository.save(creada);
+    }
+
+    public List<ListaPrecioDTO> obtenerPorEmpresa(Long empresaId){
+        List<ListaPrecio> consulta = listaPrecioRepository.findByEmpresaId(empresaId);
+        return consulta.stream().map(this::mapearADTO).collect(Collectors.toList());
+    }
+
+    public ListaPrecio mapearADominio(ListaPrecioDTO dto){
+        ListaPrecio lista = new ListaPrecio();
+        lista.setId(dto.getId());
+        lista.setNombre(dto.getNombre());
+        lista.setEmpresa(empresaRepository.findById(dto.getEmpresaId()).orElseThrow());
+        lista.setActiva(dto.getActiva());
+        return lista;
+    }
+
+    public ListaPrecioDTO mapearADTO(ListaPrecio listaPrecio) {
+        ListaPrecioDTO dto = new ListaPrecioDTO();
+        dto.setId(listaPrecio.getId());
+        dto.setNombre(listaPrecio.getNombre());
+        if(listaPrecio.getEmpresa()!=null){
+            dto.setEmpresaId(listaPrecio.getEmpresa().getId());
         }
-
-        Empresa empresa = empresaRepository.findById(dto.getEmpresaId())
-                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Empresa no encontrada"));
-
-        ListaPrecio entidad = ListaPrecio.builder()
-                .nombre(dto.getNombre())
-                .empresa(empresa)
-                .activa(Boolean.TRUE.equals(dto.getActiva()))
-                .build();
-
-        return mapearADTO(listaPrecioRepository.save(entidad));
-    }
-
-    public List<ListaPrecioDTO> listarPorEmpresa(Long empresaId) {
-        return listaPrecioRepository.findByEmpresaId(empresaId)
-                .stream()
-                .map(this::mapearADTO)
-                .collect(Collectors.toList());
-    }
-
-    private ListaPrecioDTO mapearADTO(ListaPrecio lp) {
-        return ListaPrecioDTO.builder()
-                .id(lp.getId())
-                .nombre(lp.getNombre())
-                .empresaId(lp.getEmpresa().getId())
-                .activa(lp.getActiva())
-                .build();
+        dto.setActiva(listaPrecio.getActiva());
+        return dto;
     }
 }
