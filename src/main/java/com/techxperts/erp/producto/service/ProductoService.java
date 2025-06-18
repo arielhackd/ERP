@@ -109,41 +109,67 @@ public class ProductoService {
     }
 
     public ProductoDTO actualizarProducto(Long id, ProductoDTO dto){
-        Producto existente = productoRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado."));
+        Producto existente = productoRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Producto no encontrado con ID: " + id));
+        validarActualizacionProducto(id, dto, existente);
 
-        // Puedes optar por actualizar solo campos no nulos del DTO
-        existente.setCodigo(dto.getCodigo());
-        existente.setNombre(dto.getNombre());
-        existente.setDescripcion2(dto.getDescripcion2());
-        existente.setDescripcion3(dto.getDescripcion3());
-        existente.setObservaciones(dto.getObservaciones());
-        existente.setTipo(dto.getTipo());
-        existente.setCosto(dto.getCosto());
-        existente.setPrecio(dto.getPrecio());
-        existente.setDescuentoMaximo(dto.getDescuentoMaximo());
-        existente.setPrecioOferta(dto.getPrecioOferta());
-        existente.setFechaInicioOferta(dto.getFechaInicioOferta());
-        existente.setFechaFinOferta(dto.getFechaFinOferta());
-        existente.setUsaEscalas(dto.isUsaEscalas());
+        Producto actualizado = mapearADominio(dto);
+        actualizado.setId(id); // Aseguramos que conserve el mismo ID
+        return mapearADTO(productoRepository.save(actualizado));
+    }
 
-        // Actualizar relaciones (si vienen en el DTO)
-        existente.setMarca(marcaRepository.findById(dto.getMarcaId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Marca no encontrada")));
-        existente.setMedida(medidaRepository.findById(dto.getMedidaId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Medida no encontrada")));
-        existente.setClase1(clase1Repository.findById(dto.getClase1Id())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Clase1 no encontrada")));
-        existente.setClase2(clase2Repository.findById(dto.getClase2Id())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Clase2 no encontrada")));
-        existente.setClase3(clase3Repository.findById(dto.getClase3Id())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Clase3 no encontrada")));
-        existente.setProcedencia(procedenciaRepository.findById(dto.getProcedenciaId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Procedencia no encontrada")));
-        existente.setEmpresa(empresaRepository.findById(dto.getEmpresaId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Empresa no encontrada")));
+    private void validarActualizacionProducto(Long id, ProductoDTO dto, Producto existente) {
+        Long empresaId = dto.getEmpresaId();
 
-        Producto updated = productoRepository.save(existente);
-        return mapearADTO(updated);
+        // Precio oferta < precio normal
+        if (dto.getPrecioOferta() != null && dto.getPrecioOferta().compareTo(dto.getPrecio()) >= 0) {
+            throw new BadRequestException("El precio de oferta debe ser menor al precio normal.");
+        }
+
+        // Fechas de oferta válidas
+        if (dto.getFechaInicioOferta() != null && dto.getFechaFinOferta() != null &&
+                dto.getFechaFinOferta().isBefore(dto.getFechaInicioOferta())) {
+            throw new BadRequestException("La fecha de fin de la oferta no puede ser anterior a la fecha de inicio.");
+        }
+
+        // Descuento máximo válido
+        if (dto.getDescuentoMaximo() != null && dto.getDescuentoMaximo().compareTo(BigDecimal.valueOf(100)) > 0) {
+            throw new BadRequestException("El descuento máximo no puede ser mayor al 100%.");
+        }
+
+        // Si el código fue modificado, validar que no esté duplicado
+        if (!dto.getCodigo().equals(existente.getCodigo())) {
+            boolean codigoDuplicado = productoRepository.existsByCodigoAndEmpresaId(dto.getCodigo(), empresaId);
+            if (codigoDuplicado) {
+                throw new BadRequestException("Ya existe otro producto con este código en esta empresa.");
+            }
+        }
+
+        // Validar entidades relacionadas
+        clase1Repository.findById(dto.getClase1Id())
+                .filter(c -> c.getEmpresa().getId().equals(empresaId))
+                .orElseThrow(() -> new BadRequestException("La Clase1 no existe o no pertenece a la empresa"));
+
+        clase2Repository.findById(dto.getClase2Id())
+                .filter(c -> c.getEmpresa().getId().equals(empresaId))
+                .orElseThrow(() -> new BadRequestException("La Clase2 no existe o no pertenece a la empresa"));
+
+        clase3Repository.findById(dto.getClase3Id())
+                .filter(c -> c.getEmpresa().getId().equals(empresaId))
+                .orElseThrow(() -> new BadRequestException("La Clase3 no existe o no pertenece a la empresa"));
+
+        marcaRepository.findById(dto.getMarcaId())
+                .filter(m -> m.getEmpresa().getId().equals(empresaId))
+                .orElseThrow(() -> new BadRequestException("La Marca no existe o no pertenece a la empresa"));
+
+        medidaRepository.findById(dto.getMedidaId())
+                .filter(m -> m.getEmpresa().getId().equals(empresaId))
+                .orElseThrow(() -> new BadRequestException("La Medida no existe o no pertenece a la empresa"));
+
+        if (dto.getProcedenciaId() != null) {
+            procedenciaRepository.findById(dto.getProcedenciaId())
+                    .filter(p -> p.getEmpresa().getId().equals(empresaId))
+                    .orElseThrow(() -> new BadRequestException("La Procedencia no existe o no pertenece a la empresa"));
+        }
     }
 
     public Producto mapearADominio(ProductoDTO dto) {
