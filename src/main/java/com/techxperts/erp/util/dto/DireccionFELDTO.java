@@ -8,6 +8,7 @@ import lombok.*;
 @Builder
 public class DireccionFELDTO {
 
+    private Long id;
     private String pais;
     private String departamento;
     private String municipio;

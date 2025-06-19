@@ -61,7 +61,7 @@ public class Cliente {
     private boolean bloquearCredito;
 
     @Column(name = "limite_credito")
-    private Double limiteCredito;
+    private Integer limiteCredito;
 
     @Column(name = "dias_credito")
     private Integer diasCredito;
