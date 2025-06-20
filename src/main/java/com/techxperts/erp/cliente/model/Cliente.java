@@ -70,7 +70,7 @@ public class Cliente {
     private Integer descuento;
 
     @Column(name = "fecha_ingreso")
-    private LocalDate fechaIngreso;
+    private LocalDate fechaIngreso = LocalDate.now();;
 
     @Column(name = "activo")
     private boolean activo;
