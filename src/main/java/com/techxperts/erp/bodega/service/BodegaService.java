@@ -17,7 +17,20 @@ public class BodegaService {
         return bodegaRepository.save(bodega);
     }
 
-    public List<Bodega> listar() {
-        return bodegaRepository.findAll();
+    public List<Bodega> obtenerTodosPorEmpresa(Long empresaId) {
+        return bodegaRepository.findByEmpresaId(empresaId);
+    }
+
+    public Bodega obtenerPorEmpesa(Long id, Long empresaId){
+        return bodegaRepository.findByIdAndEmpresaId(id, empresaId).orElseThrow();
+    }
+
+    public Bodega actualizarBodega(Long id, Bodega bodega, Long empresaId) {
+        Bodega consulta = bodegaRepository.findByIdAndEmpresaId(id, empresaId).orElseThrow(() -> new RuntimeException("Bodega no encontrado con ID: " + id));
+        consulta.setId(id);
+        consulta.setNombre(bodega.getNombre());
+        consulta.setDireccion(bodega.getDireccion());
+        consulta.setActiva(bodega.isActiva());
+        return bodegaRepository.save(consulta);
     }
 }
