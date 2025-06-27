@@ -30,6 +30,11 @@ public class TipoDocumentoService {
                 .collect(Collectors.toList());
     }
 
+    public TipoDocumentoDTO obtenerPorIdEmpresaId(Long tipoDocumentoId, Long empresaId){
+        TipoDocumento respuesta = tipoDocumentoRepository.findByIdAndEmpresaId(tipoDocumentoId, empresaId).orElseThrow(() -> new RuntimeException("TipoDocumento no encontrado"));
+        return mapearADTO(respuesta);
+    }
+
     public TipoDocumentoDTO crear (TipoDocumentoDTO dto){
         Empresa empresa = empresaRepository.findById(dto.getEmpresaId()).orElseThrow(null);
         Bodega bodegaEntrada = bodegaRepository.findById(dto.getBodegaEntradaId()).orElseThrow(null);
@@ -43,19 +48,19 @@ public class TipoDocumentoService {
         return mapearADTO(tipoDocumentoRepository.save(creado));
     }
 
-    public TipoDocumentoDTO actualizar (TipoDocumento dto){
+    public TipoDocumentoDTO actualizar (TipoDocumentoDTO dto){
         TipoDocumento existente = tipoDocumentoRepository.findById(dto.getId()).orElseThrow(() -> new RuntimeException("TipoDocumento no encontrado"));
-        existente.setEmpresa(dto.getEmpresa());
+        existente.setEmpresa(empresaRepository.findById(dto.getEmpresaId()).orElseThrow());
         existente.setCodigo(dto.getCodigo());
         existente.setTipoDocumento(dto.getTipoDocumento());
         existente.setDescripcion(dto.getDescripcion());
         existente.setSerie(dto.getSerie());
         existente.setGestion(dto.getGestion());
         existente.setCorrelativo(dto.getCorrelativo());
-        existente.setBodegaEntrada(dto.getBodegaEntrada());
-        existente.setBodegaSalida(dto.getBodegaSalida());
+        existente.setBodegaEntrada(bodegaRepository.findById(dto.getBodegaEntradaId()).orElseThrow());
+        existente.setBodegaSalida(bodegaRepository.findById(dto.getBodegaSalidaId()).orElseThrow());
         existente.setItems(dto.getItems());
-        existente.setReporte(dto.getReporte());
+        existente.setReporte(reporteRepository.findById(dto.getReporteId()).orElseThrow());
         existente.setTipoImpresion(dto.getTipoImpresion());
         existente.setPredet(dto.getPredet());
         existente.setDocumentoElectronico(dto.getDocumentoElectronico());
@@ -66,7 +71,7 @@ public class TipoDocumentoService {
         return mapearADTO(tipoDocumentoRepository.save(existente));
     }
 
-    private TipoDocumento mapearADominio (TipoDocumentoDTO dto){
+    public TipoDocumento mapearADominio (TipoDocumentoDTO dto){
         TipoDocumento dominio = new TipoDocumento();
         dominio.setId(dto.getId());
         dominio.setEmpresa(empresaRepository.findById(dto.getEmpresaId()).orElseThrow(null));
@@ -90,7 +95,7 @@ public class TipoDocumentoService {
         return dominio;
     }
 
-    private TipoDocumentoDTO mapearADTO(TipoDocumento dominio){
+    public TipoDocumentoDTO mapearADTO(TipoDocumento dominio){
         TipoDocumentoDTO dto = new TipoDocumentoDTO();
         dto.setId(dominio.getId());
         dto.setEmpresaId(dominio.getEmpresa().getId());
