@@ -2,8 +2,9 @@ package com.techxperts.erp.usuario.dto;
 
 import lombok.*;
 
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UsuarioDTO {
     private Long id;
     private String username;
