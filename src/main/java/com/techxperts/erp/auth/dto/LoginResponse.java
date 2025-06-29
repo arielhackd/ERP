@@ -9,4 +9,5 @@ public class LoginResponse {
     private Long usuarioId;
     private String nombre;
     private Long empresaId;
+    private String periodo;
 }

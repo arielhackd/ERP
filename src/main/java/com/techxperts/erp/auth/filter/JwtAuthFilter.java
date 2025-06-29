@@ -23,6 +23,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final UsuarioRepository usuarioRepo;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return request.getServletPath().contains("/api/auth/login");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
