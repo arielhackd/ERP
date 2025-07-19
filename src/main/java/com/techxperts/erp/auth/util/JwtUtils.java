@@ -30,10 +30,10 @@ public class JwtUtils {
                 .compact();
     }
 
-    public String generarToken(Usuario usuario, Long empresaId, String periodo) {
+    public String generarToken(Usuario usuario, Long empresaId, Long periodoId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("empresaId", empresaId);
-        claims.put("periodo", periodo);
+        claims.put("periodoId", periodoId);
         claims.put("usuarioId", usuario.getId());
         claims.put("nombre", usuario.getNombre());
 

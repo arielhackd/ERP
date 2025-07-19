@@ -9,5 +9,5 @@ public class LoginRequest {
     private String username;
     private String password;
     private Long empresaId;
-    private String periodo; // Ejemplo: "2025-06"
+    private Long periodoId; // Ejemplo: "2025-06"
 }
