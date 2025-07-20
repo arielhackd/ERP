@@ -39,7 +39,7 @@ public class JwtUtils {
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(usuario.getUsername())
+                .setSubject(usuario.getId().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 1 día
                 .signWith(SignatureAlgorithm.HS256, jwtSecret)
@@ -66,9 +66,8 @@ public class JwtUtils {
     }
 
     private Claims parseToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
+        return Jwts.parser()
+                .setSigningKey(jwtSecret) // Asegúrate que sea el mismo usado para firmar
                 .parseClaimsJws(token)
                 .getBody();
     }

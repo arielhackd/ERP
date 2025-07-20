@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 @Component
 @RequiredArgsConstructor
@@ -38,14 +39,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-
         if (!jwtUtils.validarToken(token)) {
+            System.out.println("Token invalido");
             chain.doFilter(request, response);
             return;
         }
 
         Long usuarioId = jwtUtils.getUsuarioId(token);
-
         var usuario = usuarioRepo.findById(usuarioId);
         if (usuario.isEmpty()) {
             chain.doFilter(request, response);
